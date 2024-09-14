@@ -1,4 +1,5 @@
 using Connect4.API.Lib.Board;
+using Connect4.API.Lib.Strategies;
 
 namespace Connect4.API.Lib;
 
@@ -14,13 +15,27 @@ public class Game : IGame
         private Player _winner;
 
         private readonly IGameBoard _board;
+        
+        private readonly IGameStrategy _strategy;
 
         public Game(Player playerOne, Player playerTwo)
         {
             _playerOne = playerOne;
             _playerTwo = playerTwo;
-            _currentPlayer = _playerOne;
+            
+            var sortPlayer = new Random().Next(1, 3);
+            _currentPlayer = sortPlayer == 1 ? _playerOne : _playerTwo;
+           
             _board = new GameBoard();
+            _strategy = new EasyLevelStrategy(_board);
+            
+            if (_currentPlayer.IsComputerPlayer)
+            {
+                (int playedColumn, int playedRow) = _strategy.Play(_currentPlayer, GetOpponent());
+                CheckGameStatus(playedColumn, playedRow);
+
+                SwitchPlayer();
+            }
         }
 
         public IGameBoard GetBoard()
@@ -32,6 +47,7 @@ public class Game : IGame
         {
             return _isOver;
         }
+        
         public Player GetCurrentPlayer()
         {
             return _currentPlayer;
@@ -67,6 +83,19 @@ public class Game : IGame
         private void SwitchPlayer()
         {
             _currentPlayer = _currentPlayer == _playerTwo ? _playerOne : _playerTwo;
+            
+            if (_currentPlayer.IsComputerPlayer)
+            {
+                (int playedColumn, int playedRow) = _strategy.Play(_currentPlayer, GetOpponent());
+                CheckGameStatus(playedColumn, playedRow);
+
+                SwitchPlayer();
+            }
+        }
+        
+        private Player GetOpponent()
+        {
+            return _currentPlayer == _playerTwo ? _playerOne : _playerTwo;
         }
         
         private void CheckGameStatus(int column, int row)

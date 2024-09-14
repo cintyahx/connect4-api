@@ -1,14 +1,10 @@
 namespace Connect4.API.Lib;
 
-public class Player
+public class Player(string name, string color, bool isComputerPlayer)
 {
-    public Player(string name, string color)
-    {
-        Name = name;
-        Color = color;
-    }
+    public string Name { get; } = name;
 
-    public string Name { get; }
+    public string Color { get;  } = color;
 
-    public string Color { get;  }
+    public bool IsComputerPlayer { get; } = isComputerPlayer;
 }

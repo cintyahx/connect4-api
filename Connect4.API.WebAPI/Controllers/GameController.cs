@@ -11,8 +11,14 @@ public class GameController : ApiController
     [HttpPost]
     public IActionResult CreateGame([FromBody] PlayersDto players)
     {
-        var playerOne = new Player(players.PlayerOne.Name, players.PlayerOne.Color);
-        var playerTwo = new Player(players.PlayerTwo.Name, players.PlayerTwo.Color);
+        var playerOne = new Player(players.PlayerOne.Name, 
+                                    players.PlayerOne.Color, 
+                                    players.PlayerOne.IsComputerPlayer);
+        
+        var playerTwo = new Player(players.PlayerTwo.Name, 
+                                    players.PlayerTwo.Color, 
+                                    players.PlayerTwo.IsComputerPlayer);
+        
         _game = new Game(playerOne, playerTwo);
         return Ok();
     }
