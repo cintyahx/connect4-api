@@ -10,6 +10,7 @@
     public class PlayerDto
     {
         public string Name { get; set; }
+        
         public string Color { get; set; }
         
         public bool IsComputerPlayer { get; set; }

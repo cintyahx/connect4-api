@@ -32,7 +32,7 @@ public abstract class BaseGame<TMoveInfo, TBaseGameBoard, TGameStrategy>
         var sortPlayer = new Random().Next(1, 3);
         _currentPlayer = sortPlayer == 1 ? _playerOne : _playerTwo;
 
-        if (!_currentPlayer.IsComputer) return;
+        if (!_currentPlayer.IsComputerPlayer) return;
 
         var moveInfo = _strategy.Play(_currentPlayer, _playerOne, _board);
         DropDisc(moveInfo);
@@ -86,7 +86,7 @@ public abstract class BaseGame<TMoveInfo, TBaseGameBoard, TGameStrategy>
     {
         _currentPlayer = _currentPlayer == _playerTwo ? _playerOne : _playerTwo;
 
-        if (!_currentPlayer.IsComputer) return;
+        if (!_currentPlayer.IsComputerPlayer) return;
         
         var moveInfo = _strategy.Play(_currentPlayer, GetOpponent(), _board);
         DropDisc(moveInfo);

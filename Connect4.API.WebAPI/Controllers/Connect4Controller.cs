@@ -1,7 +1,5 @@
 using Connect4.API.Lib;
-using Connect4.API.Lib.Board;
 using Connect4.API.Lib.Connect4;
-using Connect4.API.Lib.GamePlay;
 using Connect4.API.WebAPI.Common;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,11 +14,11 @@ public class Connect4Controller : ApiController
     {
         var playerOne = new Player(players.PlayerOne.Name, 
                                     players.PlayerOne.Color, 
-                                    players.PlayerOne.IsComputer);
+                                    players.PlayerOne.IsComputerPlayer);
         
         var playerTwo = new Player(players.PlayerTwo.Name, 
                                     players.PlayerTwo.Color, 
-                                    players.PlayerTwo.IsComputer);
+                                    players.PlayerTwo.IsComputerPlayer);
         
         _game = new Connect4Game(playerOne, playerTwo);
         return Ok();

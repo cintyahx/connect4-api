@@ -14,11 +14,11 @@ public class TicTacToeController : ApiController
     {
         var playerOne = new Player(players.PlayerOne.Name, 
                                     players.PlayerOne.Color, 
-                                    players.PlayerOne.IsComputer);
+                                    players.PlayerOne.IsComputerPlayer);
         
         var playerTwo = new Player(players.PlayerTwo.Name, 
                                     players.PlayerTwo.Color, 
-                                    players.PlayerTwo.IsComputer);
+                                    players.PlayerTwo.IsComputerPlayer);
         
         _game = new TicTacToeGame(playerOne, playerTwo);
         return Ok();
