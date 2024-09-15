@@ -1,214 +1,197 @@
 namespace Connect4.API.Lib.Board;
 
-  public class GameBoard : IGameBoard
+public abstract class BaseGameBoard<TMoveInfo>(int columns, int rows, int totalDiscsInRowToWin)
+    : IGameBoard<TMoveInfo> where TMoveInfo : BaseMoveInfo
+{
+    protected readonly Player[,] Cells = new Player[columns, rows];
+
+    public virtual BoardCell DropDisc(TMoveInfo moveInfo, Player player)
     {
-        private readonly Player[,] _cells = new Player[7, 6];
-        private const int TotalDiscsInRowToWin = 4;
+        throw new NotImplementedException();
+    }
 
-        public static readonly int InvalidRowColumn = -1;
+    public string GetDiscColorAtCell(int column, int row)
+    {
+        var player = Cells[column, row];
+        return player?.Color;
+    }
 
-        public int GetColumnLength()
+    public bool HasPlayerWon(Player player, BoardCell lastPlayedCell)
+    {
+        return CheckWinningPossibility(player, lastPlayedCell);
+    }
+    public bool IsFull()
+    {
+        return RowIndices().
+            All(row => ColumnIndices().
+                All(colum => Cells[colum, row] != null));
+    }
+    
+    public IEnumerable<int> ColumnIndices()
+    {
+        for (var c = 0; c < GetColumnLength(); c++)
         {
-            return _cells.GetLength(0);
+            yield return c;
+        }
+    }
+
+    public IEnumerable<int> RowIndices()
+    {
+        for (var r = 0; r < GetRowLength(); r++)
+        {
+            yield return r;
+        }
+    }
+    
+    public bool IsColumnFull(int column)
+    {
+        return RowIndices().All(r => Cells[column, r] != null);
+    }
+    
+    protected bool IsPositionAvailable(int column, int row)
+    {
+        return IsValidCell(column, row) && Cells[column, row] is null;
+    }
+    
+    private bool CheckWinningPossibility(Player player, BoardCell cellToCheckFrom)
+    {
+        if (!IsValidCell(cellToCheckFrom))
+        {
+            return false;
         }
 
-        public int GetRowLength()
-        {
-            return _cells.GetLength(1);
-        }
+        return CheckHorizontally(player, cellToCheckFrom)
+               || CheckVertically(player, cellToCheckFrom)
+               || CheckPositiveDiagonal(player, cellToCheckFrom)
+               || CheckNegativeDiagonal(player, cellToCheckFrom);
+    }
 
-        public IEnumerable<int> ColumnIndices()
+    private bool CheckHorizontally(Player player, BoardCell currentCell)
+    {
+        for (var startColumn = currentCell.Column - 3; startColumn <= currentCell.Column; startColumn++)
         {
-            for (int c = 0; c < GetColumnLength(); c++)
+            var startCell = new BoardCell(startColumn, currentCell.Row);
+            var canConnect = CanConnect(player, currentCell, startCell, BoardNavigationHelper.GetNextCellOnRight);
+
+            if (canConnect)
             {
-                yield return c;
+                return true;
             }
         }
 
-        public IEnumerable<int> RowIndices()
+        return false;
+    }
+
+    private bool CheckVertically(Player player, BoardCell currentCell)
+    {
+        var canConnect = CanConnect(player, currentCell, currentCell, BoardNavigationHelper.GetNextCellBelow);
+
+        return canConnect;
+    }
+
+    private bool CheckPositiveDiagonal(Player player, BoardCell currentCell)
+    {
+        for (var startDistance = 3; startDistance >= 0; startDistance--)
         {
-            for (int r = 0; r < GetRowLength(); r++)
+            var startCell = new BoardCell(
+                currentCell.Column - startDistance,
+                currentCell.Row + startDistance
+                );
+            
+            var canConnect = CanConnect(player, currentCell, startCell,
+                BoardNavigationHelper.GetNextCellOnRightCornerAbove);
+
+            if (canConnect)
             {
-                yield return r;
+                return true;
             }
         }
 
-        public string GetDiscColorAtCell(int column, int row)
-        {
-            var player = _cells[column, row];
-            return player?.Color;
-        }
+        return false;
+    }
 
-        public bool IsFull()
+    private bool CheckNegativeDiagonal(Player player, BoardCell currentCell)
+    {
+        for (var startDistance = 3; startDistance >= 0; startDistance--)
         {
-            return ColumnIndices()
-                .All(column => _cells[column, 0] != null);
-        }
+            var startCell = new BoardCell(currentCell.Column - startDistance, currentCell.Row - startDistance);
+            var canConnect = CanConnect(player, currentCell, startCell,
+                BoardNavigationHelper.GetNextCellOnRightCornerBelow);
 
-        public bool IsColumnFull(int column)
-        {
-            return _cells[column, 0] != null;
-        }
-
-        public int DropDisc(int column, Player player)
-        {
-            int nextRow = GetNextAvailableRow(column);
-
-            if (nextRow >= 0)
+            if (canConnect)
             {
-                _cells[column, nextRow] = player;
+                return true;
             }
-
-            return nextRow;
         }
 
-        public int GetColumnToWin(Player player)
+        return false;
+    }
+
+    private bool CanConnect(Player player, BoardCell currentCell, BoardCell startCell,
+        Func<BoardCell, BoardCell> getNextCellFunc)
+    {
+        var cellToCheck = startCell;
+        var cellToBePlayedNext = IsAlreadyPlayed(currentCell) ? null : currentCell;
+
+        var count = 0;
+
+        for (var i = 0; i < totalDiscsInRowToWin; i++)
         {
-            foreach (var column in ColumnIndices())
-            {
-                if (CanPlayerWin(player, column))
-                {
-                    return column;
-                }
-            }
-
-            return InvalidRowColumn;
-        }
-
-        public bool CanPlayerWin(Player player, int column)
-        {
-            int nextRow = GetNextAvailableRow(column);
-            var currentCell = new BoardCell(column, nextRow);
-
-            return CheckWinningPossibility(player, currentCell);
-        }
-
-        public bool HasPlayerWon(Player player, BoardCell lastPlayedCell)
-        {
-            return CheckWinningPossibility(player, lastPlayedCell);
-        }
-
-        private bool CheckWinningPossibility(Player player, BoardCell cellToCheckFrom)
-        {
-            if (!IsValidCell(cellToCheckFrom))
+            if (!IsValidCell(cellToCheck.Column, cellToCheck.Row))
             {
                 return false;
             }
 
-            return CheckHorizontally(player, cellToCheckFrom)
-                   || CheckVertically(player, cellToCheckFrom)
-                   || CheckPositiveDiagonal(player, cellToCheckFrom)
-                   || CheckNegativeDiagonal(player, cellToCheckFrom);
-        }
-
-        private bool CheckHorizontally(Player player, BoardCell currentCell)
-        {
-            for (var startColumn = currentCell.Column - 3; startColumn <= currentCell.Column; startColumn++)
+            if (!cellToCheck.Equals(cellToBePlayedNext) &&
+                GetDiscColorAtCell(cellToCheck.Column, cellToCheck.Row) != player.Color)
             {
-                var startCell = new BoardCell(startColumn, currentCell.Row);
-                var canConnect = CanConnectFour(player, currentCell, startCell, BoardNavigationHelper.GetNextCellOnRight);
-
-                if (canConnect)
-                {
-                    return true;
-                }
+                return false;
             }
 
-            return false;
+            count++;
+            cellToCheck = getNextCellFunc(cellToCheck);
         }
 
-        private bool CheckVertically(Player player, BoardCell currentCell)
-        {
-            var canConnect = CanConnectFour(player, currentCell, currentCell, BoardNavigationHelper.GetNextCellBelow);
-
-            return canConnect;
-        }
-
-        private bool CheckPositiveDiagonal(Player player, BoardCell currentCell)
-        {
-            for (int startDistance = 3; startDistance >= 0; startDistance--)
-            {
-                var startCell = new BoardCell(currentCell.Column - startDistance, currentCell.Row + startDistance);
-                var canConnect = CanConnectFour(player, currentCell, startCell, BoardNavigationHelper.GetNextCellOnRightCornerAbove);
-
-                if (canConnect)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private bool CheckNegativeDiagonal(Player player, BoardCell currentCell)
-        {
-            for (int startDistance = 3; startDistance >= 0; startDistance--)
-            {
-                var startCell = new BoardCell(currentCell.Column - startDistance, currentCell.Row - startDistance);
-                var canConnect = CanConnectFour(player, currentCell, startCell, BoardNavigationHelper.GetNextCellOnRightCornerBelow);
-
-                if (canConnect)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private bool CanConnectFour(Player player, BoardCell currentCell, BoardCell startCell, Func<BoardCell, BoardCell> getNextCellFunc)
-        {
-            var cellToCheck = startCell;
-            var cellToBePlayedNext = IsAlreadyPlayed(currentCell) ? null : currentCell;
-
-            int count = 0;
-
-            for (int i = 0; i < TotalDiscsInRowToWin; i++)
-            {
-                if (!IsValidCell(cellToCheck.Column, cellToCheck.Row))
-                {
-                    return false;
-                }
-
-                if (!cellToCheck.Equals(cellToBePlayedNext) &&
-                    GetDiscColorAtCell(cellToCheck.Column, cellToCheck.Row) != player.Color)
-                {
-                    return false;
-                }
-
-                count++;
-                cellToCheck = getNextCellFunc(cellToCheck);
-            }
-
-            return count == TotalDiscsInRowToWin;
-        }
-
-        private bool IsAlreadyPlayed(BoardCell cell)
-        {
-            return IsValidCell(cell) && _cells[cell.Column, cell.Row] != null;
-        }
-
-        private bool IsValidCell(BoardCell cell)
-        {
-            return IsValidCell(cell.Column, cell.Row);
-        }
-
-        private bool IsValidCell(int column, int row)
-        {
-            return column >= 0 && column < GetColumnLength()
-                               && row >= 0 && row < GetRowLength();
-        }
-
-        private int GetNextAvailableRow(int column)
-        {
-            for (int row = GetRowLength() - 1; row >= 0; row--)
-            {
-                if (_cells[column, row] == null)
-                {
-                    return row;
-                }
-            }
-
-            return InvalidRowColumn;
-        }
+        return count == totalDiscsInRowToWin;
     }
+
+    private bool IsAlreadyPlayed(BoardCell cell)
+    {
+        return IsValidCell(cell) && Cells[cell.Column, cell.Row] != null;
+    }
+
+
+    private bool IsValidCell(BoardCell cell)
+    {
+        return IsValidCell(cell.Column, cell.Row);
+    }
+
+    private bool IsValidCell(int column, int row)
+    {
+        return column >= 0 && column < GetColumnLength()
+                           && row >= 0 && row < GetRowLength();
+    }
+
+    public int GetColumnLength()
+    {
+        return Cells.GetLength(0);
+    }
+
+    public int GetRowLength()
+    {
+        return Cells.GetLength(1);
+    }
+    
+    public IEnumerable<BoardCell> GetAvailableCells()
+    {
+        var availableCells = new List<BoardCell>();
+        foreach (var column in ColumnIndices())
+        {
+            availableCells.AddRange(from row in RowIndices() 
+                where Cells[column, row] is null 
+                select new BoardCell(column, row));
+        }
+
+        return availableCells;
+    }
+}

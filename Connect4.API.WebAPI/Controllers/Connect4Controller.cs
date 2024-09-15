@@ -1,25 +1,28 @@
 using Connect4.API.Lib;
+using Connect4.API.Lib.Board;
+using Connect4.API.Lib.Connect4;
+using Connect4.API.Lib.GamePlay;
 using Connect4.API.WebAPI.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Connect4.API.WebAPI.Controllers;
 
-public class GameController : ApiController
+public class Connect4Controller : ApiController
 {
-    private static Game _game;
+    private static Connect4Game _game;
     
     [HttpPost]
     public IActionResult CreateGame([FromBody] PlayersDto players)
     {
         var playerOne = new Player(players.PlayerOne.Name, 
                                     players.PlayerOne.Color, 
-                                    players.PlayerOne.IsComputerPlayer);
+                                    players.PlayerOne.IsComputer);
         
         var playerTwo = new Player(players.PlayerTwo.Name, 
                                     players.PlayerTwo.Color, 
-                                    players.PlayerTwo.IsComputerPlayer);
+                                    players.PlayerTwo.IsComputer);
         
-        _game = new Game(playerOne, playerTwo);
+        _game = new Connect4Game(playerOne, playerTwo);
         return Ok();
     }
 
@@ -68,8 +71,8 @@ public class GameController : ApiController
     [Route("drop-disc")]
     public IActionResult DropDisc([FromBody] int column)
     {
-       _game.DropDisc(column);
+        var connectMoveInfo = new Connect4MoveInfo(column);
+        _game.DropDisc(connectMoveInfo);
        return Ok();
     }
-  
 }
