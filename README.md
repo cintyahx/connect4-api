@@ -2,7 +2,7 @@
 Web API criada durante a disciplina de Arquitetura de Software como forma de avaliação parcial.
 
 ## Front-end
-[Front-end connect4] (https://github.com/cintyahx/connect4)
+[Front-end connect4](https://github.com/cintyahx/connect4)
 
 ## Desenvolvedores
 Cintya Miotto - cintyadallacosta@gmail.com  
