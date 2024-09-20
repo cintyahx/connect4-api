@@ -34,4 +34,4 @@ Renata Filadelfo - renata.filadelfo1@gmail.com
 ## Protótipos
 ![](settings.png)
 ![](connect4.png)
-![](ticTacToe.png)
+![](tictactoe.png)
