@@ -67,6 +67,16 @@ public abstract class BaseGame<TMoveInfo, TBaseGameBoard, TGameStrategy>
         }
     }
 
+    public Player GetPlayerOne()
+    {
+        return _playerOne;
+    }
+
+    public Player GetPlayerTwo()
+    {
+        return _playerTwo;
+    }
+
     public TBaseGameBoard GetBoard()
     {
         return _board;

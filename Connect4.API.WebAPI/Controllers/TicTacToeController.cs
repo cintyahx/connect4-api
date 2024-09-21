@@ -1,4 +1,5 @@
 using Connect4.API.Lib;
+using Connect4.API.Lib.GamePlay;
 using Connect4.API.Lib.TicTacToe;
 using Connect4.API.WebAPI.Common;
 using Microsoft.AspNetCore.Mvc;
@@ -12,13 +13,21 @@ public class TicTacToeController : ApiController
     [HttpPost]
     public IActionResult CreateGame([FromBody] PlayersDto players)
     {
-        var playerOne = new Player(players.PlayerOne.Name, 
-                                    players.PlayerOne.Color, 
-                                    players.PlayerOne.IsComputerPlayer);
+        var playerOne = new Player()
+        {
+            Id = players.PlayerOne.Id,
+            Name = players.PlayerOne.Name,
+            Color = players.PlayerOne.Color, 
+            IsComputerPlayer = players.PlayerOne.IsComputerPlayer,
+        };
         
-        var playerTwo = new Player(players.PlayerTwo.Name, 
-                                    players.PlayerTwo.Color, 
-                                    players.PlayerTwo.IsComputerPlayer);
+        var playerTwo = new Player()
+        {
+            Id = players.PlayerTwo.Id,
+            Name = players.PlayerTwo.Name,
+            Color = players.PlayerTwo.Color, 
+            IsComputerPlayer = players.PlayerTwo.IsComputerPlayer,
+        };
         
         _game = new TicTacToeGame(playerOne, playerTwo);
         return Ok();

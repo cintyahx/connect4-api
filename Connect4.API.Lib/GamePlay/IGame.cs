@@ -15,4 +15,8 @@ public interface IGame<TMoveInfo, TBaseGameBoard>
     bool IsOver();
 
     void DropDisc(TMoveInfo moveInfo);
+    
+    Player GetPlayerOne();
+
+    Player GetPlayerTwo();
 }

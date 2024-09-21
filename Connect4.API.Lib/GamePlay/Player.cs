@@ -1,10 +1,13 @@
-namespace Connect4.API.Lib;
+namespace Connect4.API.Lib.GamePlay;
 
-public class Player(string name, string color, bool isComputerPlayer)
+public class Player
 {
-    public string Name { get; } = name;
+    public int Id { get; set; }
+    
+    public string Name { get; set; }
 
-    public string Color { get;  } = color;
+    public string Color { get; set; }
 
-    public bool IsComputerPlayer { get; } = isComputerPlayer;
+    public bool IsComputerPlayer { get; set; }
+    
 }

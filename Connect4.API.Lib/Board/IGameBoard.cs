@@ -1,3 +1,5 @@
+using Connect4.API.Lib.GamePlay;
+
 namespace Connect4.API.Lib.Board;
 
 public interface IGameBoard<in TMoveInfo> 
