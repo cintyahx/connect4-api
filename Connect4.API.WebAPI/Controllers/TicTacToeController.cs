@@ -1,4 +1,3 @@
-using Connect4.API.Lib;
 using Connect4.API.Lib.GamePlay;
 using Connect4.API.Lib.TicTacToe;
 using Connect4.API.WebAPI.Common;
@@ -30,31 +29,24 @@ public class TicTacToeController : ApiController
         };
         
         _game = new TicTacToeGame(playerOne, playerTwo);
-        return Ok();
+        
+        var boardDto = BoardUtility.GetBoardDto<TicTacToeMoveInfo, TicTacToeBoard, TicTacToeStrategy>(_game);
+        
+        return Ok(new Response(boardDto));
     }
 
     [HttpGet]
     public IActionResult GetBoard()
     {
-        var board = new List<DiscDto>();
-
-        for (var row = 0; row < _game.GetBoard().GetRowLength(); row++)
-        {
-            for (var column = 0; column < _game.GetBoard().GetColumnLength(); column++)
-            {
-                var color = _game.GetBoard().GetDiscColorAtCell(column, row);
-                board.Add(new DiscDto(color, column, row));
-            }
-        }
-
-        return Ok(new Response(board));
+        var boardDto = BoardUtility.GetBoardDto<TicTacToeMoveInfo, TicTacToeBoard, TicTacToeStrategy>(_game);
+        return Ok(new Response(boardDto));
     }
 
     [HttpGet]
     [Route("current-player")]
     public IActionResult GetCurrentPlayer()                
     {
-        var result = _game.GetCurrentPlayer();
+        var result = BoardUtility.GetPlayerDto(_game.GetCurrentPlayer());
         return Ok(new Response(result));
     }
    
@@ -62,7 +54,7 @@ public class TicTacToeController : ApiController
     [Route("winner")]
     public  IActionResult GetWinner()
     {
-        var result = _game.GetWinner();
+        var result = BoardUtility.GetPlayerDto(_game.GetWinner());
         return Ok(new Response(result));
     }
    
