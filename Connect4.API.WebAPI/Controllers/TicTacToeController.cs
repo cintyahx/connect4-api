@@ -68,9 +68,9 @@ public class TicTacToeController : ApiController
    
     [HttpPost]
     [Route("drop-disc")]
-    public IActionResult DropDisc([FromBody] int column, int row)
+    public IActionResult DropDisc([FromBody] DiscDto disc)
     {
-        _game.DropDisc(new TicTacToeMoveInfo(column,row));
+        _game.DropDisc(new TicTacToeMoveInfo(disc.Column, disc.Row));
        return Ok();
     }
 }
