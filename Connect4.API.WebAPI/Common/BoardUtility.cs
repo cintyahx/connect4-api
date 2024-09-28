@@ -37,7 +37,8 @@ public static class BoardUtility
             for (var column = 0; column < game.GetBoard().GetColumnLength(); column++)
             {
                 var color = game.GetBoard().GetDiscColorAtCell(column, row);
-                discs.Add(new DiscDto(color, column, row));
+                var player = game.GetBoard().GetPlayerMoveAtCell(column, row) ?? 0;
+                discs.Add(new DiscDto(color, column, row, player));
             }
         }
 

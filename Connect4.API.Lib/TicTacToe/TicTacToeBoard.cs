@@ -13,6 +13,6 @@ public class TicTacToeBoard(int columns, int rows, int totalDiscsInRowToWin)
         
         Cells[moveInfo.Column, moveInfo.Row] = player;
         
-        return new BoardCell(moveInfo.Column, moveInfo.Row);
+        return new BoardCell(moveInfo.Column, moveInfo.Row, player.Id);
     }
 }

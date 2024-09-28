@@ -18,6 +18,12 @@ public abstract class BaseGameBoard<TMoveInfo>(int columns, int rows, int totalD
         return player?.Color;
     }
 
+    public int? GetPlayerMoveAtCell(int column, int row)
+    {
+        var player = Cells[column, row];
+        return player?.Id;
+    }
+
     public bool HasPlayerWon(Player player, BoardCell lastPlayedCell)
     {
         return CheckWinningPossibility(player, lastPlayedCell);
@@ -72,7 +78,7 @@ public abstract class BaseGameBoard<TMoveInfo>(int columns, int rows, int totalD
     {
         for (var startColumn = currentCell.Column - 3; startColumn <= currentCell.Column; startColumn++)
         {
-            var startCell = new BoardCell(startColumn, currentCell.Row);
+            var startCell = new BoardCell(startColumn, currentCell.Row, player.Id);
             var canConnect = CanConnect(player, currentCell, startCell, BoardNavigationHelper.GetNextCellOnRight);
 
             if (canConnect)
@@ -97,7 +103,8 @@ public abstract class BaseGameBoard<TMoveInfo>(int columns, int rows, int totalD
         {
             var startCell = new BoardCell(
                 currentCell.Column - startDistance,
-                currentCell.Row + startDistance
+                currentCell.Row + startDistance,
+                player.Id
                 );
             
             var canConnect = CanConnect(player, currentCell, startCell,
@@ -116,7 +123,7 @@ public abstract class BaseGameBoard<TMoveInfo>(int columns, int rows, int totalD
     {
         for (var startDistance = 3; startDistance >= 0; startDistance--)
         {
-            var startCell = new BoardCell(currentCell.Column - startDistance, currentCell.Row - startDistance);
+            var startCell = new BoardCell(currentCell.Column - startDistance, currentCell.Row - startDistance, player.Id);
             var canConnect = CanConnect(player, currentCell, startCell,
                 BoardNavigationHelper.GetNextCellOnRightCornerBelow);
 
@@ -191,7 +198,7 @@ public abstract class BaseGameBoard<TMoveInfo>(int columns, int rows, int totalD
         {
             availableCells.AddRange(from row in RowIndices() 
                 where Cells[column, row] is null 
-                select new BoardCell(column, row));
+                select new BoardCell(column, row, 0));
         }
 
         return availableCells;

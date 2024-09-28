@@ -19,7 +19,7 @@ public class Connect4Board(int columns, int rows, int totalDiscsInRowToWin)
 
         Cells[moveInfo.Column, nextRow] = player;
         
-        return new BoardCell(moveInfo.Column, nextRow);
+        return new BoardCell(moveInfo.Column, nextRow, player.Id);
     }
 
     private int GetNextAvailableRow(int column)

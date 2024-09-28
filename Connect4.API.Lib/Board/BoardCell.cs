@@ -5,11 +5,13 @@ public class BoardCell
     public int Column { get; }
 
     public int Row { get; }
+    public int Player { get; }
 
-    public BoardCell(int column, int row)
+    public BoardCell(int column, int row, int player)
     {
         Column = column;
         Row = row;
+        Player = player;
     }
 
 
